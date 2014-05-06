@@ -13,4 +13,14 @@ class TestEnamdictParser < Test::Unit::TestCase
       EnamdictParser.parse(filename)
     end
   end
+
+  def test_get_translation
+    filename = 'data/smallJMnedict.xml'
+    expected_name = 'Chusen'
+    failure_message = "Can't get translations"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    assert_include enamdict_parser.names, expected_name, failure_message
+  end
 end
