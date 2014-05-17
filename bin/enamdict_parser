@@ -1,0 +1,7 @@
+$LOAD_PATH << File.join(__dir__, '..', 'lib')
+
+require 'enamdict_parser'
+
+if $PROGRAM_NAME == __FILE__
+  EnamdictParser.run
+end

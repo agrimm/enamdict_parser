@@ -2,6 +2,12 @@
 class EnamdictParser
   attr_reader :names
 
+  ENAMDICT_FILENAME = 'data/JMnedict.xml'
+  def self.run
+    enamdict_parser = parse(ENAMDICT_FILENAME)
+    enamdict_parser.output
+  end
+
   def self.parse(filename)
     file = File.open(filename)
     new(file)
@@ -36,5 +42,11 @@ class EnamdictParser
   SPACE = ' '
   def unsuitable_name?(name)
     name.include?(SPACE)
+  end
+
+  OUTPUT_FILENAME = 'names.txt'
+  def output
+    output_text = @names.join("\n")
+    File.write(OUTPUT_FILENAME, output_text)
   end
 end
