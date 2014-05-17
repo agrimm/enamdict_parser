@@ -1,32 +1,36 @@
-require 'nokogiri'
-
 # Parses the enamdict file
 class EnamdictParser
   attr_reader :names
 
   def self.parse(filename)
-    text = File.read(filename)
-    nokogiri = Nokogiri::XML(text)
-    new(nokogiri)
+    file = File.open(filename)
+    new(file)
   end
 
-  ENTRY_NODE_XPATH = '/JMnedict/entry'
-  def initialize(nokogiri)
-    @nokogiri = nokogiri
-    @entry_nodes = @nokogiri.xpath(ENTRY_NODE_XPATH)
+  def initialize(file)
+    @file = file
     @names = determine_names
   end
 
   def determine_names
-    names = @entry_nodes.map(&method(:determine_name))
-    suitable_names = names.reject(&method(:unsuitable_name?))
+    potential_names = find_potential_names
+    suitable_names = potential_names.reject(&method(:unsuitable_name?))
     suitable_names.uniq
   end
 
-  TRANS_DET_XPATH = 'trans/trans_det'
-  def determine_name(node)
-    trans_det_node = node.xpath(TRANS_DET_XPATH).first
-    trans_det_node.content
+  TRANS_DET_ELEMENT_START = '<trans_det>'
+  TRANS_DET_ELEMENT_END = '</trans_det>'
+  START_ELEMENT_LENGTH = TRANS_DET_ELEMENT_START.length
+  END_ELEMENT_LENGTH = TRANS_DET_ELEMENT_END.length
+  def find_potential_names
+    names = []
+    for line in @file.each_line
+      next unless line.include?(TRANS_DET_ELEMENT_START)
+      fail 'Assumption broken' unless line.include?(TRANS_DET_ELEMENT_END)
+      name = line[(START_ELEMENT_LENGTH)...(-END_ELEMENT_LENGTH - 1)]
+      names << name
+    end
+    names
   end
 
   SPACE = ' '
