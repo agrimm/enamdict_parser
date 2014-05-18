@@ -23,4 +23,14 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     assert_include enamdict_parser.names, expected_name, failure_message
   end
+
+  def test_dont_include_katakana_names
+    filename = 'data/smallJMnedict.xml'
+    unexpected_name = 'Irwin'
+    failure_message = "Can't exclude katakana (presumably foreign) names"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    refute_includes enamdict_parser.names, unexpected_name, failure_message
+  end
 end
