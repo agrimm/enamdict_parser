@@ -24,19 +24,24 @@ class EnamdictParser
     suitable_names.uniq
   end
 
-  TRANS_DET_ELEMENT_START = '<trans_det>'
-  TRANS_DET_ELEMENT_END = '</trans_det>'
-  START_ELEMENT_LENGTH = TRANS_DET_ELEMENT_START.length
-  END_ELEMENT_LENGTH = TRANS_DET_ELEMENT_END.length
   def find_potential_names
     names = []
     for line in @file.each_line
-      next unless line.include?(TRANS_DET_ELEMENT_START)
-      fail 'Assumption broken' unless line.include?(TRANS_DET_ELEMENT_END)
-      name = line[(START_ELEMENT_LENGTH)...(-END_ELEMENT_LENGTH - 1)]
+      name = parse_name_if_applicable(line)
+      next if name.nil?
       names << name
     end
     names
+  end
+
+  TRANS_DET_ELEMENT_START = '<trans_det>'
+  TRANS_DET_ELEMENT_END = '</trans_det>'
+  TRANS_DET_START_LENGTH = TRANS_DET_ELEMENT_START.length
+  TRANS_DET_END_LENGTH = TRANS_DET_ELEMENT_END.length
+  def parse_name_if_applicable(line)
+    return unless line.include?(TRANS_DET_ELEMENT_START)
+    fail 'Assumption broken' unless line.include?(TRANS_DET_ELEMENT_END)
+    line[(TRANS_DET_START_LENGTH)...(-TRANS_DET_END_LENGTH - 1)]
   end
 
   SPACE = ' '
