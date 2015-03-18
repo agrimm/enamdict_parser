@@ -1,6 +1,11 @@
+require 'set'
+require 'forwardable'
+
 # Parses the enamdict file
 class EnamdictParser
-  attr_reader :names
+  extend Forwardable
+
+  def_delegators :@name_list, :names, :add_name, :output
 
   ENAMDICT_FILENAME = 'data/JMnedict.xml'
   def self.run
@@ -15,25 +20,17 @@ class EnamdictParser
 
   def initialize(file)
     @file = file
-    @names = determine_names
+    @name_list = NameList.new
+    parse_file
   end
 
-  def determine_names
-    potential_names = find_potential_names
-    suitable_names = potential_names.reject(&method(:unsuitable_name?))
-    suitable_names.uniq
-  end
-
-  def find_potential_names
-    names = []
+  def parse_file
     for line in @file.each_line
       check_for_katakana_status(line)
       name = parse_name_if_applicable(line)
       next if name.nil?
-      next if @katakana_entry
-      names << name
+      add_name(name, @katakana_entry)
     end
-    names
   end
 
   REB_ELEMENT_START = '<reb>'
@@ -56,6 +53,21 @@ class EnamdictParser
     fail 'Assumption broken' unless line.include?(TRANS_DET_ELEMENT_END)
     line[(TRANS_DET_START_LENGTH)...(-TRANS_DET_END_LENGTH - 1)]
   end
+end
+
+# List of names
+class NameList
+  attr_reader :names
+
+  def initialize
+    @names = Set.new
+  end
+
+  def add_name(name, katakana_entry)
+    return if unsuitable_name?(name)
+    return if katakana_entry
+    @names << name
+  end
 
   SPACE = ' '
   def unsuitable_name?(name)
@@ -64,7 +76,7 @@ class EnamdictParser
 
   OUTPUT_FILENAME = 'names.txt'
   def output
-    output_text = @names.join("\n")
+    output_text = @names.to_a.join("\n")
     File.write(OUTPUT_FILENAME, output_text)
   end
 end
