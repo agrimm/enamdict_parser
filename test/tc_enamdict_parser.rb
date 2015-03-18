@@ -33,4 +33,14 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     refute_includes enamdict_parser.names, unexpected_name, failure_message
   end
+
+  def test_does_not_include_names_with_spaces
+    filename = 'data/smallJMnedict.xml'
+    unexpected_name = 'Aika Shun (1984.12.8-)'
+    failure_message = "Can't exclude names with spaces"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    refute_includes enamdict_parser.names, unexpected_name, failure_message
+  end
 end
