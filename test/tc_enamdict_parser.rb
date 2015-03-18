@@ -21,7 +21,7 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     enamdict_parser = EnamdictParser.parse(filename)
 
-    assert_include enamdict_parser.names, expected_name, failure_message
+    assert_include enamdict_parser.japanese_names, expected_name, failure_message
   end
 
   def test_dont_include_katakana_names
@@ -31,7 +31,17 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     enamdict_parser = EnamdictParser.parse(filename)
 
-    refute_includes enamdict_parser.names, unexpected_name, failure_message
+    refute_includes enamdict_parser.japanese_names, unexpected_name, failure_message
+  end
+
+  def test_list_katakana_names_as_non_japanese
+    filename = 'data/smallJMnedict.xml'
+    expected_name = 'Irwin'
+    failure_message = "Can't list non-Japanese names"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    assert_include enamdict_parser.non_japanese_names, expected_name, failure_message
   end
 
   def test_does_not_include_names_with_spaces
@@ -41,6 +51,6 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     enamdict_parser = EnamdictParser.parse(filename)
 
-    refute_includes enamdict_parser.names, unexpected_name, failure_message
+    refute_includes enamdict_parser.japanese_names, unexpected_name, failure_message
   end
 end

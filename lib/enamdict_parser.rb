@@ -5,7 +5,7 @@ require 'forwardable'
 class EnamdictParser
   extend Forwardable
 
-  def_delegators :@name_list, :names, :add_name, :output
+  def_delegators :@name_list, :japanese_names, :non_japanese_names, :add_name, :output
 
   ENAMDICT_FILENAME = 'data/JMnedict.xml'
   def self.run
@@ -57,16 +57,21 @@ end
 
 # List of names
 class NameList
-  attr_reader :names
+  attr_reader :japanese_names, :non_japanese_names
 
   def initialize
-    @names = Set.new
+    @japanese_names = Set.new
+    @non_japanese_names = Set.new
   end
 
   def add_name(name, katakana_entry)
     return if unsuitable_name?(name)
-    return if katakana_entry
-    @names << name
+
+    if katakana_entry
+      @non_japanese_names << name
+    else
+      @japanese_names << name
+    end
   end
 
   SPACE = ' '
@@ -74,9 +79,12 @@ class NameList
     name.include?(SPACE)
   end
 
-  OUTPUT_FILENAME = 'names.txt'
+  JAPANESE_FILENAME = 'japanese_names.txt'
+  NON_JAPANESE_FILENAME = 'non_japanese_names.txt'
   def output
-    output_text = @names.to_a.join("\n")
-    File.write(OUTPUT_FILENAME, output_text)
+    japanese_text = @japanese_names.to_a.join("\n")
+    File.write(JAPANESE_FILENAME, japanese_text)
+    non_japanese_text = @non_japanese_names.to_a.join("\n")
+    File.write(NON_JAPANESE_FILENAME, non_japanese_text)
   end
 end
