@@ -1,2 +1,5 @@
 For:
   EnforcedStyle: for
+
+Metrics/LineLength:
+  Max: 86

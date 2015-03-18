@@ -1,6 +1,6 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-ruby "2.1.5"
+ruby '2.1.5'
 
-gem "minitest", "~> 4.0"
-gem "rubocop"
+gem 'minitest', '~> 4.0'
+gem 'rubocop'
