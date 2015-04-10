@@ -53,4 +53,36 @@ class TestEnamdictParser < Test::Unit::TestCase
 
     refute_includes enamdict_parser.japanese_names, unexpected_name, failure_message
   end
+
+  def test_detect_organizations
+    filename = 'data/smallJMnedict.xml'
+    name = 'PAAL'
+    failure_message = "Can't detect organizations"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    refute_includes enamdict_parser.japanese_names, name, failure_message
+    assert_includes enamdict_parser.non_person_names, name, failure_message
+  end
+
+  def test_detect_companies
+    filename = 'data/smallJMnedict.xml'
+    name = '3M'
+    failure_message = "Can't detect companies"
+
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    refute_includes enamdict_parser.non_japanese_names, name, failure_message
+    assert_includes enamdict_parser.non_person_names, name, failure_message
+  end
+
+  def test_detect_products
+    filename = 'data/smallJMnedict.xml'
+    name = 'iPod'
+    failure_message = "Can't detect products"
+    enamdict_parser = EnamdictParser.parse(filename)
+
+    refute_includes enamdict_parser.non_japanese_names, name, failure_message
+    assert_includes enamdict_parser.non_person_names, name, failure_message
+  end
 end
